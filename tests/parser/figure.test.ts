@@ -16,4 +16,16 @@ describe('parseFigure', () => {
       'figure source must not be empty',
     );
   });
+
+  it('preserves a multiline caption as Markdown source', () => {
+    const source = `.. figure:: ./image.png
+
+   First paragraph.
+
+   Second paragraph.`;
+
+    expect(parseFigure(source).caption).toEqual({
+      raw: 'First paragraph.\n\nSecond paragraph.',
+    });
+  });
 });

@@ -1,7 +1,7 @@
 import type { FigureDirective } from '../types.js';
 
 export function parseFigure(source: string): FigureDirective {
-  const [openingLine] = source.replaceAll('\r\n', '\n').split('\n');
+  const [openingLine, ...contentLines] = source.replaceAll('\r\n', '\n').split('\n');
   const openingMatch = /^\s*\.\. figure::(?:[ \t]+(.*?))?[ \t]*$/.exec(
     openingLine ?? '',
   );
@@ -15,9 +15,25 @@ export function parseFigure(source: string): FigureDirective {
     throw new Error('Invalid figure: figure source must not be empty.');
   }
 
+  const caption = dedentContent(contentLines).join('\n').trim();
+
   return {
     type: 'figure',
     src,
     options: {},
+    ...(caption ? { caption: { raw: caption } } : {}),
   };
+}
+
+function dedentContent(lines: string[]): string[] {
+  const nonBlankLines = lines.filter(line => line.trim() !== '');
+  const indentation = Math.min(
+    ...nonBlankLines.map(line => line.length - line.trimStart().length),
+  );
+
+  if (!Number.isFinite(indentation)) {
+    return [];
+  }
+
+  return lines.map(line => line.slice(indentation));
 }
