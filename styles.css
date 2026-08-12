@@ -1,0 +1,21 @@
+.rst-figure {
+  width: fit-content;
+  max-width: 100%;
+}
+
+.rst-figure > img {
+  display: block;
+  max-width: 100%;
+}
+
+.rst-figure--left {
+  margin-right: auto;
+}
+
+.rst-figure--center {
+  margin-inline: auto;
+}
+
+.rst-figure--right {
+  margin-left: auto;
+}

@@ -8,6 +8,7 @@ describe('pluginRstDirectives', () => {
     const plugin = pluginRstDirectives();
 
     expect(plugin.name).toBe('rspress-plugin-rst-directives');
+    expect(plugin.globalStyles).toMatch(/styles\.css$/);
     expect(plugin.markdown?.remarkPlugins).toEqual([
       [remarkRstDirectives, {}],
     ]);
