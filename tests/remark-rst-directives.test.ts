@@ -35,10 +35,52 @@ After the table.`;
     expect(tree.children[2]).toMatchObject({ type: 'paragraph' });
   });
 
+  it('replaces a figure source range and preserves following Markdown', async () => {
+    const source = `.. figure:: https://example.com/image.png
+   :alt: External image
+
+   **Important** diagram.
+
+After the figure.`;
+
+    const tree = await transform(source);
+
+    expect(tree.children[0]).toMatchObject({
+      type: 'mdxJsxFlowElement',
+      name: 'figure',
+      children: [
+        {
+          name: 'img',
+          attributes: [
+            { name: 'src', value: 'https://example.com/image.png' },
+            { name: 'alt', value: 'External image' },
+          ],
+        },
+        { name: 'figcaption' },
+      ],
+    });
+    expect(tree.children[1]).toMatchObject({ type: 'paragraph' });
+  });
+
+  it('adds an ESM asset import for a relative figure image', async () => {
+    const tree = await transform('.. figure:: ./images/sample.png');
+
+    expect(tree.children).toMatchObject([
+      {
+        type: 'mdxjsEsm',
+        value:
+          'import __rstFigureImage0 from "./images/sample.png";',
+      },
+      { type: 'mdxJsxFlowElement', name: 'figure' },
+    ]);
+  });
+
   it.each([
     `.. note::
 
    hello`,
+    `.. image:: ./image.png`,
+    `![sample](./image.png)`,
     `| A | B |
 |---|---|
 | C | D |`,

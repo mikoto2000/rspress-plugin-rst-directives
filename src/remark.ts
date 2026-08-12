@@ -1,22 +1,26 @@
 import type { Root } from 'mdast';
+import type { MdxjsEsm } from 'mdast-util-mdxjs-esm';
 import type { Plugin } from 'unified';
 
 import { findDirectiveBlocks } from './parser/directive.js';
+import { parseFigure } from './parser/figure.js';
 import { parseListTable } from './parser/list-table.js';
+import {
+  createFigureImageImport,
+  transformFigure,
+} from './transform/figure.js';
 import { transformListTable } from './transform/list-table.js';
 import type { RstDirectivesOptions } from './types.js';
 
 export const remarkRstDirectives: Plugin<[RstDirectivesOptions?], Root> =
   function remarkRstDirectives(options = {}) {
     return (tree, file) => {
-      if (options.directives?.listTable === false) {
-        return;
-      }
-
       const source = String(file);
       const blocks = findDirectiveBlocks(source, tree)
-        .filter(block => block.name === 'list-table')
+        .filter(block => isEnabled(block.name, options))
         .sort((left, right) => right.startOffset - left.startOffset);
+      const imageImports: MdxjsEsm[] = [];
+      let imageIndex = 0;
 
       for (const block of blocks) {
         const firstIndex = tree.children.findIndex(child =>
@@ -39,8 +43,25 @@ export const remarkRstDirectives: Plugin<[RstDirectivesOptions?], Root> =
         }
 
         try {
-          const table = transformListTable(parseListTable(block.source));
-          tree.children.splice(firstIndex, lastIndex - firstIndex + 1, table);
+          if (block.name === 'list-table') {
+            const table = transformListTable(parseListTable(block.source));
+            tree.children.splice(firstIndex, lastIndex - firstIndex + 1, table);
+          } else if (block.name === 'figure') {
+            const figure = parseFigure(block.source);
+            const imageIdentifier = isLocalImageSource(figure.src)
+              ? `__rstFigureImage${imageIndex++}`
+              : undefined;
+            if (imageIdentifier) {
+              imageImports.push(
+                createFigureImageImport(imageIdentifier, figure.src),
+              );
+            }
+            tree.children.splice(
+              firstIndex,
+              lastIndex - firstIndex + 1,
+              transformFigure(figure, imageIdentifier),
+            );
+          }
         } catch (error) {
           const message = error instanceof Error ? error.message : String(error);
           const location = `${file.path || '<unknown>'}:${block.startLine}:${block.startColumn}`;
@@ -50,8 +71,24 @@ export const remarkRstDirectives: Plugin<[RstDirectivesOptions?], Root> =
           });
         }
       }
+
+      tree.children.unshift(...imageImports);
     };
   };
+
+function isEnabled(name: string, options: RstDirectivesOptions): boolean {
+  if (name === 'list-table') {
+    return options.directives?.listTable !== false;
+  }
+  if (name === 'figure') {
+    return options.directives?.figure !== false;
+  }
+  return false;
+}
+
+function isLocalImageSource(source: string): boolean {
+  return !/^(?:[a-z][a-z\d+.-]*:|\/\/|\/)/i.test(source);
+}
 
 function overlaps(
   startOffset: number | undefined,
