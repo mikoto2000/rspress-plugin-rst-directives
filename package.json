@@ -1,0 +1,35 @@
+{
+  "name": "rspress-plugin-rst-directives",
+  "version": "0.1.0",
+  "description": "Use selected reStructuredText directives in Rspress Markdown and MDX.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run test && npm run typecheck && npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "peerDependencies": {
+    "@rspress/core": "^2.0.0"
+  },
+  "devDependencies": {
+    "@rspress/core": "^2.0.19",
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0",
+    "vitest": "^4.1.10"
+  }
+}
