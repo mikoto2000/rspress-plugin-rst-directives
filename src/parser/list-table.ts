@@ -28,18 +28,38 @@ export function parseListTable(source: string): ListTableDirective {
 
 function parseRows(lines: string[]): ListTableRow[] {
   const rows: ListTableRow[] = [];
+  let currentCell: { raw: string } | undefined;
 
   for (const line of lines) {
     const rowMatch = /^\* -(?: (.*))?$/.exec(line);
     if (rowMatch) {
-      rows.push({ cells: [{ raw: rowMatch[1] ?? '' }] });
+      currentCell = { raw: rowMatch[1] ?? '' };
+      rows.push({ cells: [currentCell] });
       continue;
     }
 
     const cellMatch = /^  -(?: (.*))?$/.exec(line);
     const currentRow = rows.at(-1);
     if (cellMatch && currentRow) {
-      currentRow.cells.push({ raw: cellMatch[1] ?? '' });
+      currentCell = { raw: cellMatch[1] ?? '' };
+      currentRow.cells.push(currentCell);
+      continue;
+    }
+
+    if (line === '' && currentCell) {
+      currentCell.raw += '\n';
+      continue;
+    }
+
+    const continuationMatch = /^ {4}(.*)$/.exec(line);
+    if (continuationMatch && currentCell) {
+      currentCell.raw += `\n${continuationMatch[1] ?? ''}`;
+    }
+  }
+
+  for (const row of rows) {
+    for (const cell of row.cells) {
+      cell.raw = cell.raw.replace(/\n+$/, '');
     }
   }
 

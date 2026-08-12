@@ -120,4 +120,17 @@ describe('parseListTable', () => {
       'widths defines 3 columns, but the table has 2 columns',
     );
   });
+
+  it('preserves multiline cell content', () => {
+    const source = `.. list-table::
+
+   * - foo
+     - line 1
+
+       line 2`;
+
+    expect(parseListTable(source).rows[0]?.cells[1]?.raw).toBe(
+      'line 1\n\nline 2',
+    );
+  });
 });
