@@ -15,9 +15,10 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "build:fixture": "npm run build && rspress build -c examples/basic/rspress.config.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check": "npm run test && npm run typecheck && npm run build"
+    "check": "npm run test && npm run typecheck && npm run build && npm run build:fixture"
   },
   "engines": {
     "node": ">=20"
