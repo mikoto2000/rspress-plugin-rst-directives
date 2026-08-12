@@ -1,4 +1,5 @@
 import type { ListTableDirective, ListTableRow } from '../types.js';
+import { validateListTable } from '../validation/list-table.js';
 
 export function parseListTable(source: string): ListTableDirective {
   const [openingLine, ...contentLines] = source.replaceAll('\r\n', '\n').split('\n');
@@ -9,11 +10,14 @@ export function parseListTable(source: string): ListTableDirective {
   const bodyLines = dedentContent(contentLines);
   const rows = parseRows(bodyLines);
 
-  return {
+  const table: ListTableDirective = {
     type: 'list-table',
     options: { headerRows: 0 },
     rows,
   };
+
+  validateListTable(table);
+  return table;
 }
 
 function parseRows(lines: string[]): ListTableRow[] {

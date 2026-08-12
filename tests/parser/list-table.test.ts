@@ -36,4 +36,16 @@ describe('parseListTable', () => {
       { cells: [{ raw: 'C' }, { raw: 'D' }] },
     ]);
   });
+
+  it('rejects inconsistent column counts', () => {
+    const source = `.. list-table::
+
+   * - A
+     - B
+   * - C`;
+
+    expect(() => parseListTable(source)).toThrow(
+      'row 2 has 1 cell, but row 1 has 2 cells',
+    );
+  });
 });
