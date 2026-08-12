@@ -67,6 +67,41 @@ describe('parseListTable', () => {
     expect(parseListTable(source).options.headerRows).toBe(1);
   });
 
+  it('defaults header-rows to zero when omitted', () => {
+    const source = `.. list-table::
+
+   * - A
+     - B
+   * - C
+     - D`;
+
+    expect(parseListTable(source).options.headerRows).toBe(0);
+  });
+
+  it('accepts header-rows set to zero', () => {
+    const source = `.. list-table::
+   :header-rows: 0
+
+   * - A
+     - B`;
+
+    expect(parseListTable(source).options.headerRows).toBe(0);
+  });
+
+  it('accepts multiple header rows', () => {
+    const source = `.. list-table::
+   :header-rows: 2
+
+   * - Group
+     - Value
+   * - Name
+     - Description
+   * - foo
+     - Foo description`;
+
+    expect(parseListTable(source).options.headerRows).toBe(2);
+  });
+
   it.each(['abc', '-1'])('rejects invalid header-rows value %s', value => {
     const source = `.. list-table::
    :header-rows: ${value}`;
