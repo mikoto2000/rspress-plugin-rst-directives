@@ -60,6 +60,34 @@ describe('transformListTable', () => {
     });
   });
 
+  it('renders multiple header rows as th cells', () => {
+    const node = transformListTable({
+      type: 'list-table',
+      options: { headerRows: 2 },
+      rows: [
+        { cells: [{ raw: 'Group' }, { raw: 'Value' }] },
+        { cells: [{ raw: 'Name' }, { raw: 'Description' }] },
+        { cells: [{ raw: 'foo' }, { raw: 'Foo description' }] },
+      ],
+    });
+
+    expect(node).toMatchObject({
+      children: [
+        {
+          name: 'thead',
+          children: [
+            { children: [{ name: 'th' }, { name: 'th' }] },
+            { children: [{ name: 'th' }, { name: 'th' }] },
+          ],
+        },
+        {
+          name: 'tbody',
+          children: [{ children: [{ name: 'td' }, { name: 'td' }] }],
+        },
+      ],
+    });
+  });
+
   it('parses cell content as Markdown AST', () => {
     const node = transformListTable({
       type: 'list-table',
