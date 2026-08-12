@@ -40,4 +40,23 @@ describe('parseFigure', () => {
       caption: { raw: 'Caption.' },
     });
   });
+
+  it.each(['640px', '80%', '32rem'])('accepts width %s', width => {
+    const source = `.. figure:: ./image.png
+   :width: ${width}`;
+
+    expect(parseFigure(source).options.width).toBe(width);
+  });
+
+  it.each(['invalid!!!', 'javascript:alert(1)', '-1px'])(
+    'rejects invalid width %s',
+    width => {
+      const source = `.. figure:: ./image.png
+   :width: ${width}`;
+
+      expect(() => parseFigure(source)).toThrow(
+        `figure option "width" has invalid value "${width}"`,
+      );
+    },
+  );
 });

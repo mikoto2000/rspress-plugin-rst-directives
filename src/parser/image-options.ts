@@ -23,6 +23,8 @@ export function parseImageOptions(lines: string[]): ParsedImageOptions {
     const value = match[2] ?? '';
     if (name === 'alt') {
       options.alt = value;
+    } else if (name === 'width') {
+      options.width = parseCssSize(name, value);
     } else {
       throw new Error(`Invalid figure: unsupported option "${name}".`);
     }
@@ -34,4 +36,16 @@ export function parseImageOptions(lines: string[]): ParsedImageOptions {
   }
 
   return { options, bodyLines: lines.slice(index) };
+}
+
+const cssSizePattern = /^(?:0|(?:\d+(?:\.\d+)?|\.\d+)(?:%|px|rem|em|vw|vh|vmin|vmax|ch|ex|cm|mm|in|pt|pc))$/;
+
+function parseCssSize(name: 'width' | 'height', value: string): string {
+  if (!cssSizePattern.test(value)) {
+    throw new Error(
+      `Invalid figure: figure option "${name}" has invalid value "${value}".`,
+    );
+  }
+
+  return value;
 }
