@@ -1,5 +1,16 @@
 # RST list-table fixture
 
+## Figure
+
+.. figure:: ./images/sample.svg
+   :alt: Rspress figure pipeline
+   :width: 320px
+   :height: 160px
+   :align: center
+   :class: architecture-diagram
+
+   **Rspress** figure test with `inline code`.
+
 .. list-table:: Frozen Delights!
    :widths: 15 10 30
    :header-rows: 1
