@@ -56,4 +56,37 @@ describe('parseListTable', () => {
 
     expect(parseListTable(source).title).toBe('Test table');
   });
+
+  it('parses header-rows', () => {
+    const source = `.. list-table::
+   :header-rows: 1
+
+   * - Name
+     - Description
+   * - foo
+     - Foo description`;
+
+    expect(parseListTable(source).options.headerRows).toBe(1);
+  });
+
+  it.each(['abc', '-1'])('rejects invalid header-rows value %s', value => {
+    const source = `.. list-table::
+   :header-rows: ${value}`;
+
+    expect(() => parseListTable(source)).toThrow(
+      `header-rows must be a non-negative integer, received "${value}"`,
+    );
+  });
+
+  it('rejects header-rows greater than the row count', () => {
+    const source = `.. list-table::
+   :header-rows: 2
+
+   * - A
+     - B`;
+
+    expect(() => parseListTable(source)).toThrow(
+      'header-rows is 2, but the table has only 1 row',
+    );
+  });
 });

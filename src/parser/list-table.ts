@@ -1,5 +1,6 @@
 import type { ListTableDirective, ListTableRow } from '../types.js';
 import { validateListTable } from '../validation/list-table.js';
+import { parseListTableOptions } from './options.js';
 
 export function parseListTable(source: string): ListTableDirective {
   const [openingLine, ...contentLines] = source.replaceAll('\r\n', '\n').split('\n');
@@ -10,13 +11,14 @@ export function parseListTable(source: string): ListTableDirective {
     throw new Error('Expected a list-table directive.');
   }
 
-  const bodyLines = dedentContent(contentLines);
+  const content = dedentContent(contentLines);
+  const { options, bodyLines } = parseListTableOptions(content);
   const rows = parseRows(bodyLines);
 
   const table: ListTableDirective = {
     type: 'list-table',
     ...(openingMatch[1] ? { title: openingMatch[1] } : {}),
-    options: { headerRows: 0 },
+    options,
     rows,
   };
 
