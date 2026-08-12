@@ -22,4 +22,18 @@ describe('parseListTable', () => {
       { cells: [{ raw: 'A' }] },
     ]);
   });
+
+  it('parses multiple rows and cells', () => {
+    const source = `.. list-table::
+
+   * - A
+     - B
+   * - C
+     - D`;
+
+    expect(parseListTable(source).rows).toEqual([
+      { cells: [{ raw: 'A' }, { raw: 'B' }] },
+      { cells: [{ raw: 'C' }, { raw: 'D' }] },
+    ]);
+  });
 });
