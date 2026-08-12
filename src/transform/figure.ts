@@ -5,17 +5,23 @@ import type {
   MdxJsxAttributeValueExpression,
   MdxJsxFlowElement,
 } from 'mdast-util-mdx-jsx';
+import type { MdxjsEsm } from 'mdast-util-mdxjs-esm';
 
 import type { FigureDirective } from '../types.js';
 
-export function transformFigure(figure: FigureDirective): MdxJsxFlowElement {
+export function transformFigure(
+  figure: FigureDirective,
+  imageIdentifier?: string,
+): MdxJsxFlowElement {
   const style = createStyleAttribute(
     figure.options.width,
     figure.options.height,
   );
   const children: MdxJsxFlowElement['children'] = [
     element('img', [], [
-      attribute('src', figure.src),
+      imageIdentifier
+        ? expressionAttribute('src', imageIdentifier)
+        : attribute('src', figure.src),
       attribute('alt', figure.options.alt ?? ''),
       ...(style ? [style] : []),
     ]),
@@ -42,7 +48,60 @@ export function transformFigure(figure: FigureDirective): MdxJsxFlowElement {
   ]);
 }
 
+export function createFigureImageImport(
+  identifier: string,
+  source: string,
+): MdxjsEsm {
+  const value = `import ${identifier} from ${JSON.stringify(source)};`;
+  const program: Program = {
+    type: 'Program',
+    sourceType: 'module',
+    body: [
+      {
+        type: 'ImportDeclaration',
+        specifiers: [
+          {
+            type: 'ImportDefaultSpecifier',
+            local: { type: 'Identifier', name: identifier },
+          },
+        ],
+        source: { type: 'Literal', value: source },
+        attributes: [],
+      },
+    ],
+  };
+
+  return {
+    type: 'mdxjsEsm',
+    value,
+    data: { estree: program },
+  };
+}
+
 function attribute(name: string, value: string): MdxJsxAttribute {
+  return { type: 'mdxJsxAttribute', name, value };
+}
+
+function expressionAttribute(
+  name: string,
+  expression: string,
+): MdxJsxAttribute {
+  const program: Program = {
+    type: 'Program',
+    sourceType: 'module',
+    body: [
+      {
+        type: 'ExpressionStatement',
+        expression: { type: 'Identifier', name: expression },
+      },
+    ],
+  };
+  const value: MdxJsxAttributeValueExpression = {
+    type: 'mdxJsxAttributeValueExpression',
+    value: expression,
+    data: { estree: program },
+  };
+
   return { type: 'mdxJsxAttribute', name, value };
 }
 

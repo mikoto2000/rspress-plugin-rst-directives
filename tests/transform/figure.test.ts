@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { transformFigure } from '../../src/transform/figure.js';
+import {
+  createFigureImageImport,
+  transformFigure,
+} from '../../src/transform/figure.js';
 
 describe('transformFigure', () => {
   it('creates a semantic figure with an accessible image', () => {
@@ -89,6 +92,44 @@ describe('transformFigure', () => {
                 value: '{ width: "80%", height: "320px" }',
               },
             },
+          ],
+        },
+      ],
+    });
+  });
+
+  it('uses an ESM import expression for a local image', () => {
+    const node = transformFigure(
+      {
+        type: 'figure',
+        src: './images/sample.png',
+        options: { alt: 'Sample' },
+      },
+      '__rstFigureImage0',
+    );
+    const imageImport = createFigureImageImport(
+      '__rstFigureImage0',
+      './images/sample.png',
+    );
+
+    expect(imageImport).toMatchObject({
+      type: 'mdxjsEsm',
+      value:
+        'import __rstFigureImage0 from "./images/sample.png";',
+    });
+    expect(node).toMatchObject({
+      children: [
+        {
+          name: 'img',
+          attributes: [
+            {
+              name: 'src',
+              value: {
+                type: 'mdxJsxAttributeValueExpression',
+                value: '__rstFigureImage0',
+              },
+            },
+            { name: 'alt', value: 'Sample' },
           ],
         },
       ],
