@@ -1,4 +1,5 @@
 import type { FigureDirective } from '../types.js';
+import { parseImageOptions } from './image-options.js';
 
 export function parseFigure(source: string): FigureDirective {
   const [openingLine, ...contentLines] = source.replaceAll('\r\n', '\n').split('\n');
@@ -15,12 +16,14 @@ export function parseFigure(source: string): FigureDirective {
     throw new Error('Invalid figure: figure source must not be empty.');
   }
 
-  const caption = dedentContent(contentLines).join('\n').trim();
+  const content = dedentContent(contentLines);
+  const { options, bodyLines } = parseImageOptions(content);
+  const caption = bodyLines.join('\n').trim();
 
   return {
     type: 'figure',
     src,
-    options: {},
+    options,
     ...(caption ? { caption: { raw: caption } } : {}),
   };
 }

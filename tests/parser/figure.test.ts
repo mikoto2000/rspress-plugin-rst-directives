@@ -28,4 +28,16 @@ describe('parseFigure', () => {
       raw: 'First paragraph.\n\nSecond paragraph.',
     });
   });
+
+  it('parses the alt option separately from the caption', () => {
+    const source = `.. figure:: ./image.png
+   :alt: Sample image
+
+   Caption.`;
+
+    expect(parseFigure(source)).toMatchObject({
+      options: { alt: 'Sample image' },
+      caption: { raw: 'Caption.' },
+    });
+  });
 });
