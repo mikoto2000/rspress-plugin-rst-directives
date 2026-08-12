@@ -3,14 +3,12 @@ import { describe, expect, it } from 'vitest';
 import { parseListTable } from '../../src/parser/list-table.js';
 
 describe('parseListTable', () => {
-  it('recognizes an empty list-table directive', () => {
+  it('rejects a list-table without rows', () => {
     const source = '.. list-table::';
 
-    expect(parseListTable(source)).toEqual({
-      type: 'list-table',
-      options: { headerRows: 0 },
-      rows: [],
-    });
+    expect(() => parseListTable(source)).toThrow(
+      'list-table must contain at least one row',
+    );
   });
 
   it('parses one row with one cell', () => {
@@ -131,6 +129,16 @@ describe('parseListTable', () => {
 
     expect(parseListTable(source).rows[0]?.cells[1]?.raw).toBe(
       'line 1\n\nline 2',
+    );
+  });
+
+  it('rejects a row without cells', () => {
+    const source = `.. list-table::
+
+   *`;
+
+    expect(() => parseListTable(source)).toThrow(
+      'list-table row 1 must contain at least one cell',
     );
   });
 });

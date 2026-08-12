@@ -31,6 +31,12 @@ function parseRows(lines: string[]): ListTableRow[] {
   let currentCell: { raw: string } | undefined;
 
   for (const line of lines) {
+    if (/^\*\s*$/.test(line)) {
+      currentCell = undefined;
+      rows.push({ cells: [] });
+      continue;
+    }
+
     const rowMatch = /^\* -(?: (.*))?$/.exec(line);
     if (rowMatch) {
       currentCell = { raw: rowMatch[1] ?? '' };

@@ -1,6 +1,19 @@
 import type { ListTableDirective } from '../types.js';
 
 export function validateListTable(table: ListTableDirective): void {
+  if (table.rows.length === 0) {
+    throw new Error(
+      'Invalid list-table: list-table must contain at least one row.',
+    );
+  }
+
+  const emptyRowIndex = table.rows.findIndex(row => row.cells.length === 0);
+  if (emptyRowIndex !== -1) {
+    throw new Error(
+      `Invalid list-table: list-table row ${emptyRowIndex + 1} must contain at least one cell.`,
+    );
+  }
+
   if (table.options.headerRows > table.rows.length) {
     throw new Error(
       `Invalid list-table: header-rows is ${table.options.headerRows}, but the table has only ${table.rows.length} ${table.rows.length === 1 ? 'row' : 'rows'}.`,
