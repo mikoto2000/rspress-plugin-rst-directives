@@ -54,4 +54,44 @@ describe('transformFigure', () => {
       ],
     });
   });
+
+  it('maps image options to safe JSX attributes and figure classes', () => {
+    const node = transformFigure({
+      type: 'figure',
+      src: './image.png',
+      options: {
+        alt: 'Architecture',
+        width: '80%',
+        height: '320px',
+        align: 'center',
+        classNames: ['architecture-diagram', 'highlighted'],
+      },
+    });
+
+    expect(node).toMatchObject({
+      attributes: [
+        {
+          name: 'className',
+          value:
+            'rst-figure rst-figure--center architecture-diagram highlighted',
+        },
+      ],
+      children: [
+        {
+          name: 'img',
+          attributes: [
+            { name: 'src', value: './image.png' },
+            { name: 'alt', value: 'Architecture' },
+            {
+              name: 'style',
+              value: {
+                type: 'mdxJsxAttributeValueExpression',
+                value: '{ width: "80%", height: "320px" }',
+              },
+            },
+          ],
+        },
+      ],
+    });
+  });
 });
