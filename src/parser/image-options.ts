@@ -29,6 +29,8 @@ export function parseImageOptions(lines: string[]): ParsedImageOptions {
       options.height = parseCssSize(name, value);
     } else if (name === 'align') {
       options.align = parseAlign(value);
+    } else if (name === 'class') {
+      options.classNames = parseClassNames(value);
     } else {
       throw new Error(`Invalid figure: unsupported option "${name}".`);
     }
@@ -62,4 +64,19 @@ function parseAlign(value: string): FigureAlign {
   }
 
   return value;
+}
+
+function parseClassNames(value: string): string[] {
+  const classNames = value.trim().split(/\s+/).filter(Boolean);
+  const invalidClassName = classNames.find(
+    className => !/^[^\s"'`<>=\u0000-\u001f\u007f]+$/.test(className),
+  );
+
+  if (classNames.length === 0 || invalidClassName) {
+    throw new Error(
+      `Invalid figure: figure option "class" contains invalid class name "${invalidClassName ?? value}".`,
+    );
+  }
+
+  return classNames;
 }

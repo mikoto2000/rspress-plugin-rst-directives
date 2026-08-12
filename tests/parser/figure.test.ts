@@ -91,4 +91,32 @@ describe('parseFigure', () => {
       'figure option "align" must be left, center, or right, received "diagonal"',
     );
   });
+
+  it('parses multiple figure class names', () => {
+    const source = `.. figure:: ./image.png
+   :class: architecture-diagram highlighted`;
+
+    expect(parseFigure(source).options.classNames).toEqual([
+      'architecture-diagram',
+      'highlighted',
+    ]);
+  });
+
+  it('rejects an invalid figure class name', () => {
+    const source = `.. figure:: ./image.png
+   :class: valid <invalid>`;
+
+    expect(() => parseFigure(source)).toThrow(
+      'figure option "class" contains invalid class name "<invalid>"',
+    );
+  });
+
+  it('rejects unsupported figure options', () => {
+    const source = `.. figure:: ./image.png
+   :figwidth: image`;
+
+    expect(() => parseFigure(source)).toThrow(
+      'unsupported option "figwidth"',
+    );
+  });
 });
