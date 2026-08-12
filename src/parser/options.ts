@@ -24,6 +24,9 @@ export function parseListTableOptions(
     if (match[1] === 'header-rows') {
       options.headerRows = parseHeaderRows(match[2] ?? '');
     }
+    if (match[1] === 'widths') {
+      options.widths = parseWidths(match[2] ?? '');
+    }
     index += 1;
   }
 
@@ -42,4 +45,18 @@ function parseHeaderRows(raw: string): number {
   }
 
   return Number(raw);
+}
+
+function parseWidths(raw: string): number[] {
+  const values = raw.trim().split(/\s+/);
+  if (
+    values.length === 0 ||
+    values.some(value => !/^\d+(?:\.\d+)?$/.test(value) || Number(value) <= 0)
+  ) {
+    throw new Error(
+      `Invalid list-table: widths must contain only positive numbers, received "${raw}".`,
+    );
+  }
+
+  return values.map(Number);
 }

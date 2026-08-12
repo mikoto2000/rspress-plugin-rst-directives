@@ -89,4 +89,35 @@ describe('parseListTable', () => {
       'header-rows is 2, but the table has only 1 row',
     );
   });
+
+  it('parses widths', () => {
+    const source = `.. list-table::
+   :widths: 20 80
+
+   * - A
+     - B`;
+
+    expect(parseListTable(source).options.widths).toEqual([20, 80]);
+  });
+
+  it('rejects non-numeric widths', () => {
+    const source = `.. list-table::
+   :widths: 20 wide`;
+
+    expect(() => parseListTable(source)).toThrow(
+      'widths must contain only positive numbers, received "20 wide"',
+    );
+  });
+
+  it('rejects a widths count different from the column count', () => {
+    const source = `.. list-table::
+   :widths: 20 30 50
+
+   * - A
+     - B`;
+
+    expect(() => parseListTable(source)).toThrow(
+      'widths defines 3 columns, but the table has 2 columns',
+    );
+  });
 });

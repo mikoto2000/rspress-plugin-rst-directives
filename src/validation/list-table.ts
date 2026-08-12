@@ -12,6 +12,15 @@ export function validateListTable(table: ListTableDirective): void {
     return;
   }
 
+  if (
+    table.options.widths &&
+    table.options.widths.length !== expectedCells
+  ) {
+    throw new Error(
+      `Invalid list-table: widths defines ${table.options.widths.length} columns, but the table has ${expectedCells} columns.`,
+    );
+  }
+
   table.rows.forEach((row, index) => {
     if (row.cells.length !== expectedCells) {
       throw new Error(
