@@ -5,6 +5,7 @@ import { unified } from 'unified';
 import { describe, expect, it } from 'vitest';
 
 import { remarkRstDirectives } from '../src/remark.js';
+import type { RstDirectivesOptions } from '../src/types.js';
 
 describe('remarkRstDirectives', () => {
   it('replaces a list-table source range with a table AST', async () => {
@@ -75,6 +76,20 @@ After the figure.`;
     ]);
   });
 
+  it('can disable figure independently from list-table', async () => {
+    const source = '.. figure:: ./image.png';
+
+    expect(
+      await transform(source, { directives: { figure: false } }),
+    ).toEqual(parseWithoutPlugin(source));
+    expect(
+      (await transform(source, { directives: { listTable: false } })).children,
+    ).toMatchObject([
+      { type: 'mdxjsEsm' },
+      { type: 'mdxJsxFlowElement', name: 'figure' },
+    ]);
+  });
+
   it.each([
     `.. note::
 
@@ -103,10 +118,29 @@ After the figure.`;
       /docs[/\\]index\.md:3:1.*header-rows must be a non-negative integer/,
     );
   });
+
+  it('reports the source file and directive line for invalid figures', async () => {
+    const source = `# Invalid
+
+.. figure:: ./image.png
+   :align: diagonal`;
+
+    await expect(transform(source)).rejects.toThrow(
+      /docs[/\\]index\.md:3:1.*figure option "align".*diagonal/,
+    );
+  });
 });
 
-async function transform(source: string): Promise<Root> {
-  const processor = unified().use(remarkParse).use(remarkRstDirectives);
+async function transform(
+  source: string,
+  options?: RstDirectivesOptions,
+): Promise<Root> {
+  const processor = unified().use(remarkParse);
+  if (options) {
+    processor.use(remarkRstDirectives, options);
+  } else {
+    processor.use(remarkRstDirectives);
+  }
   const parsed = processor.parse(source);
   return processor.run(parsed, {
     path: 'docs/index.md',
