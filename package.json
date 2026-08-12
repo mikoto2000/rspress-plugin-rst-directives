@@ -2,6 +2,7 @@
   "name": "rspress-plugin-rst-directives",
   "version": "0.1.0",
   "description": "Use selected reStructuredText directives in Rspress Markdown and MDX.",
+  "license": "MIT",
   "type": "module",
   "exports": {
     ".": {
