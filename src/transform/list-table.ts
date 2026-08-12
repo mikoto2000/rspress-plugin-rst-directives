@@ -50,7 +50,7 @@ function createCell(
   name: 'th' | 'td',
   cell: ListTableCell,
 ): MdxJsxFlowElement {
-  return element(name, markdownChildren(cell.raw));
+  return element(name, cellMarkdownChildren(cell.raw));
 }
 
 function createColgroup(widths: number[]): MdxJsxFlowElement {
@@ -71,6 +71,19 @@ function createColgroup(widths: number[]): MdxJsxFlowElement {
 
 function markdownChildren(markdown: string): MdxJsxFlowElement['children'] {
   return fromMarkdown(markdown).children as MdxJsxFlowElement['children'];
+}
+
+function cellMarkdownChildren(
+  markdown: string,
+): MdxJsxFlowElement['children'] {
+  const children = fromMarkdown(markdown).children;
+  const onlyChild = children[0];
+
+  if (children.length === 1 && onlyChild?.type === 'paragraph') {
+    return onlyChild.children as MdxJsxFlowElement['children'];
+  }
+
+  return children as MdxJsxFlowElement['children'];
 }
 
 function element(

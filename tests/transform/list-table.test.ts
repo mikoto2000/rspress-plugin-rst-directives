@@ -77,14 +77,38 @@ describe('transformListTable', () => {
                 {
                   name: 'td',
                   children: [
-                    {
-                      type: 'paragraph',
-                      children: [
-                        { type: 'strong', children: [{ value: 'Bold' }] },
-                        { type: 'text', value: ' ' },
-                        { type: 'inlineCode', value: 'code' },
-                      ],
-                    },
+                    { type: 'strong', children: [{ value: 'Bold' }] },
+                    { type: 'text', value: ' ' },
+                    { type: 'inlineCode', value: 'code' },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+  });
+
+  it('keeps block wrappers for multiline cell content', () => {
+    const node = transformListTable({
+      type: 'list-table',
+      options: { headerRows: 0 },
+      rows: [{ cells: [{ raw: 'First paragraph.\n\nSecond paragraph.' }] }],
+    });
+
+    expect(node).toMatchObject({
+      children: [
+        {
+          name: 'tbody',
+          children: [
+            {
+              children: [
+                {
+                  name: 'td',
+                  children: [
+                    { type: 'paragraph' },
+                    { type: 'paragraph' },
                   ],
                 },
               ],
