@@ -26,4 +26,72 @@ describe('transformListTable', () => {
       ],
     });
   });
+
+  it('creates caption, colgroup, and header sections', () => {
+    const node = transformListTable({
+      type: 'list-table',
+      title: 'Test table',
+      options: { headerRows: 1, widths: [20, 80] },
+      rows: [
+        { cells: [{ raw: 'Name' }, { raw: 'Description' }] },
+        { cells: [{ raw: 'foo' }, { raw: 'Foo description' }] },
+      ],
+    });
+
+    expect(node).toMatchObject({
+      children: [
+        { name: 'caption' },
+        {
+          name: 'colgroup',
+          children: [
+            { name: 'col', attributes: [{ name: 'width', value: '20%' }] },
+            { name: 'col', attributes: [{ name: 'width', value: '80%' }] },
+          ],
+        },
+        {
+          name: 'thead',
+          children: [{ children: [{ name: 'th' }, { name: 'th' }] }],
+        },
+        {
+          name: 'tbody',
+          children: [{ children: [{ name: 'td' }, { name: 'td' }] }],
+        },
+      ],
+    });
+  });
+
+  it('parses cell content as Markdown AST', () => {
+    const node = transformListTable({
+      type: 'list-table',
+      options: { headerRows: 0 },
+      rows: [{ cells: [{ raw: '**Bold** `code`' }] }],
+    });
+
+    expect(node).toMatchObject({
+      children: [
+        {
+          name: 'tbody',
+          children: [
+            {
+              children: [
+                {
+                  name: 'td',
+                  children: [
+                    {
+                      type: 'paragraph',
+                      children: [
+                        { type: 'strong', children: [{ value: 'Bold' }] },
+                        { type: 'text', value: ' ' },
+                        { type: 'inlineCode', value: 'code' },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+  });
 });
