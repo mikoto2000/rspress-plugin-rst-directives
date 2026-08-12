@@ -1,4 +1,4 @@
-import type { ImageOptions } from '../types.js';
+import type { FigureAlign, ImageOptions } from '../types.js';
 
 export interface ParsedImageOptions {
   options: ImageOptions;
@@ -27,6 +27,8 @@ export function parseImageOptions(lines: string[]): ParsedImageOptions {
       options.width = parseCssSize(name, value);
     } else if (name === 'height') {
       options.height = parseCssSize(name, value);
+    } else if (name === 'align') {
+      options.align = parseAlign(value);
     } else {
       throw new Error(`Invalid figure: unsupported option "${name}".`);
     }
@@ -46,6 +48,16 @@ function parseCssSize(name: 'width' | 'height', value: string): string {
   if (!cssSizePattern.test(value)) {
     throw new Error(
       `Invalid figure: figure option "${name}" has invalid value "${value}".`,
+    );
+  }
+
+  return value;
+}
+
+function parseAlign(value: string): FigureAlign {
+  if (value !== 'left' && value !== 'center' && value !== 'right') {
+    throw new Error(
+      `Invalid figure: figure option "align" must be left, center, or right, received "${value}".`,
     );
   }
 

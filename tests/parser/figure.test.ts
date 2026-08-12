@@ -75,4 +75,20 @@ describe('parseFigure', () => {
       'figure option "height" has invalid value "auto"',
     );
   });
+
+  it.each(['left', 'center', 'right'] as const)('accepts align %s', align => {
+    const source = `.. figure:: ./image.png
+   :align: ${align}`;
+
+    expect(parseFigure(source).options.align).toBe(align);
+  });
+
+  it('rejects an unsupported alignment', () => {
+    const source = `.. figure:: ./image.png
+   :align: diagonal`;
+
+    expect(() => parseFigure(source)).toThrow(
+      'figure option "align" must be left, center, or right, received "diagonal"',
+    );
+  });
 });
