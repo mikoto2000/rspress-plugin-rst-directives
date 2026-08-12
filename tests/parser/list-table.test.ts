@@ -12,4 +12,14 @@ describe('parseListTable', () => {
       rows: [],
     });
   });
+
+  it('parses one row with one cell', () => {
+    const source = `.. list-table::
+
+   * - A`;
+
+    expect(parseListTable(source).rows).toEqual([
+      { cells: [{ raw: 'A' }] },
+    ]);
+  });
 });
