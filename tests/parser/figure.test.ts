@@ -59,4 +59,20 @@ describe('parseFigure', () => {
       );
     },
   );
+
+  it('parses a valid height', () => {
+    const source = `.. figure:: ./image.png
+   :height: 320px`;
+
+    expect(parseFigure(source).options.height).toBe('320px');
+  });
+
+  it('rejects an invalid height', () => {
+    const source = `.. figure:: ./image.png
+   :height: auto`;
+
+    expect(() => parseFigure(source)).toThrow(
+      'figure option "height" has invalid value "auto"',
+    );
+  });
 });

@@ -25,6 +25,8 @@ export function parseImageOptions(lines: string[]): ParsedImageOptions {
       options.alt = value;
     } else if (name === 'width') {
       options.width = parseCssSize(name, value);
+    } else if (name === 'height') {
+      options.height = parseCssSize(name, value);
     } else {
       throw new Error(`Invalid figure: unsupported option "${name}".`);
     }
