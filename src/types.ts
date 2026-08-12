@@ -17,3 +17,9 @@ export interface ListTableDirective {
   options: ListTableOptions;
   rows: ListTableRow[];
 }
+
+export interface RstDirectivesOptions {
+  directives?: {
+    listTable?: boolean;
+  };
+}
