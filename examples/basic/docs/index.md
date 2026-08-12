@@ -16,6 +16,15 @@
 
        It would not be crunchy, now would it?
 
+## List table without header rows
+
+.. list-table:: No header
+
+   * - A
+     - B
+   * - C
+     - D
+
 ## Ordinary Markdown table
 
 | A | B |

@@ -58,6 +58,20 @@ pluginRstDirectives({
 
 セルは通常の Markdown として再解析されます。太字、インラインコード、複数段落、リストなどの CommonMark block/inline content を利用できます。
 
+### Header rows
+
+```rst
+.. list-table:: API 一覧
+   :header-rows: 1
+
+   * - Method
+     - Path
+   * - GET
+     - /users
+```
+
+`header-rows` には 0 以上の整数を指定します。未指定時は `0` です。指定した先頭 N 行の全セルが `<th>` として扱われ、残りの行は `<td>` になります。実際の行数より大きな値はエラーです。個別のセルだけをヘッダーにする指定には対応していません。
+
 ### Options
 
 | Option | Default | Behavior |
