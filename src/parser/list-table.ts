@@ -3,7 +3,10 @@ import { validateListTable } from '../validation/list-table.js';
 
 export function parseListTable(source: string): ListTableDirective {
   const [openingLine, ...contentLines] = source.replaceAll('\r\n', '\n').split('\n');
-  if (openingLine?.trim() !== '.. list-table::') {
+  const openingMatch = /^\s*\.\. list-table::(?:[ \t]+(.*?))?[ \t]*$/.exec(
+    openingLine ?? '',
+  );
+  if (!openingMatch) {
     throw new Error('Expected a list-table directive.');
   }
 
@@ -12,6 +15,7 @@ export function parseListTable(source: string): ListTableDirective {
 
   const table: ListTableDirective = {
     type: 'list-table',
+    ...(openingMatch[1] ? { title: openingMatch[1] } : {}),
     options: { headerRows: 0 },
     rows,
   };

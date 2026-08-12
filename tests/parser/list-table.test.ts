@@ -48,4 +48,12 @@ describe('parseListTable', () => {
       'row 2 has 1 cell, but row 1 has 2 cells',
     );
   });
+
+  it('parses a title', () => {
+    const source = `.. list-table:: Test table
+
+   * - A`;
+
+    expect(parseListTable(source).title).toBe('Test table');
+  });
 });
